@@ -3,3 +3,27 @@ th {
   font-weight: bold;
   font-size: 1-2em;
 }
+.blue {
+  color: #0C2340;
+}
+
+.red {
+  color: #BD1F2D;
+}
+
+th {
+  border-bottom: 1px solid gray;
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+a {
+  text-decoration:none;
+}
+a:hover {
+  text-decoration:underline;
+}
+
+h1 {
+  text-align:center;
+}
