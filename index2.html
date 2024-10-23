@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baseball Statistics</title>
+    <script>
+        // Example dataset
+        const data = [
+            { team: 'A', hits: 150, runs: 90, home_runs: 30 },
+            { team: 'B', hits: 200, runs: 110, home_runs: 40 },
+            { team: 'C', hits: 180, runs: 100, home_runs: 35 },
+            { team: 'D', hits: 160, runs: 95, home_runs: 32 }
+        ];
+
+        // Function to calculate mean, median, and mode
+        function calculateStatistics() {
+            const hits = data.map(d => d.hits);
+            const runs = data.map(d => d.runs);
+            const homeRuns = data.map(d => d.home_runs);
+
+            const mean = arr => arr.reduce((a, b) => a + b, 0) / arr.length;
+
+            const median = arr => {
+                const sorted = [...arr].sort((a, b) => a - b);
+                const mid = Math.floor(sorted.length / 2);
+                return sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+            };
+
+            const mode = arr => {
+                const frequency = {};
+                arr.forEach(value => {
+                    frequency[value] = (frequency[value] || 0) + 1;
+                });
+                const maxFreq = Math.max(...Object.values(frequency));
+                return Object.keys(frequency).filter(key => frequency[key] === maxFreq);
+            };
+
+            // Display results
+            document.getElementById('results').innerHTML = `
+                <h2>Statistics</h2>
+                <p><strong>Mean Hits:</strong> ${mean(hits)}</p>
+                <p><strong>Median Hits:</strong> ${median(hits)}</p>
+                <p><strong>Mode Hits:</strong> ${mode(hits).join(', ')}</p>
+                <p><strong>Mean Runs:</strong> ${mean(runs)}</p>
+                <p><strong>Median Runs:</strong> ${median(runs)}</p>
+                <p><strong>Mode Runs:</strong> ${mode(runs).join(', ')}</p>
+                <p><strong>Mean Home Runs:</strong> ${mean(homeRuns)}</p>
+                <p><strong>Median Home Runs:</strong> ${median(homeRuns)}</p>
+                <p><strong>Mode Home Runs:</strong> ${mode(homeRuns).join(', ')}</p>
+            `;
+        }
+    </script>
+</head>
+<body onload="calculateStatistics()">
+    <h1>Baseball Team Statistics</h1>
+    <div id="results"></div>
+</body>
+</html>
