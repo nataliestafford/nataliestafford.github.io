@@ -1,43 +1,145 @@
-<html>
-  <head>
-   <title>Pitch Stats</title>
-   <link rel="stylesheet" href="styles.css"></link
- </head>
- <body>
-   <a href="answers.html">My Answers</a>
-   <h1 class="red">Trackman Pitch Stats Viewer</h1>h1>
-   <form onsubmit="filterData();">
-     <label>Starting date</label>   
-     <input type="date" id="startdate"></input>
-     <label>End date</label>
-     <input type="date" id="enddate"></input>
-     <button>Filter</button>
-   </form>
- Ending date
-   <table>
- </body>
-</html>
-      <tr>
-        <th>ID</th>
-        <th<Speed</th>
-        <th>Results</</th>
-      </tr>
-      <td>/<a href="details.html">Pitch 12345</a</td>
-        <td>95<td>
-          <td>--<td>
-      </tr>
-          <tr>
-      <td>/<a href="details.html">Pitch 12346</a</td>
-        <td>95<td>
-          <td>--<td>
-      </tr>
-          <tr>
-      <td>/<a href="details.html">Pitch 12347</a</td>
-        <td>95<td>
-          <td>--<td>
-      </tr>
-        </td></td>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pitch Stats Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .blue {
+            color: #0C2340;
+        }
+        .red {
+            color: #BD1F2D;
+        }
+        h1 {
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            cursor: pointer;
+        }
+        th.sorted-asc::after {
+            content: " ▲";
+        }
+        th.sorted-desc::after {
+            content: " ▼";
+        }
+        a {
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <a href="answers.html">My Answers</a>
+    <h1 class="red">Trackman Pitch Stats Viewer</h1>
+    
+    <form onsubmit="filterData(event);">
+        <label>Starting date</label>   
+        <input type="date" id="startdate">
+        <label>End date</label>
+        <input type="date" id="enddate">
+        <button type="submit">Filter</button>
+    </form>
+    
+    <h2>Data Table</h2>
+    <table id="data-table">
+        <thead>
+            <tr>
+                <th onclick="sortTable(0)">ID</th>
+                <th onclick="sortTable(1)">Speed</th>
+                <th onclick="sortTable(2)">Result</th>
+                <th onclick="sortTable(3)">Date</th>
+                <th onclick="sortTable(4)">Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data will be inserted here -->
+        </tbody>
     </table>
-    <script src="script.js"></script>
-  </body>
+
+    <script>
+        let currentSort = { column: -1, order: 'asc' };
+
+        async function fetchData() {
+            try {
+                const response = await fetch('https://compute.samford.edu/zohauth/clients/datajson');
+                const data = await response.json();
+                populateTable(data);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        function populateTable(data) {
+            const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = ''; // Clear existing data
+            data.forEach(item => {
+                const row = tableBody.insertRow();
+                const dateTime = item.datetime.split(' '); // Split date and time
+                const date = dateTime[0];
+                const time = dateTime[1];
+
+                row.insertCell(0).textContent = item.id;
+                row.insertCell(1).textContent = item.speed;
+                row.insertCell(2).textContent = item.result;
+                row.insertCell(3).textContent = date;
+                row.insertCell(4).textContent = time;
+            });
+        }
+
+        function sortTable(columnIndex) {
+            const table = document.getElementById("data-table");
+            const rows = Array.from(table.rows).slice(1); // Exclude header
+            const order = currentSort.column === columnIndex && currentSort.order === 'asc' ? 'desc' : 'asc';
+
+            rows.sort((a, b) => {
+                const aText = a.cells[columnIndex].textContent;
+                const bText = b.cells[columnIndex].textContent;
+
+                if (columnIndex === 1) { // Speed column
+                    return order === 'asc' ? aText - bText : bText - aText;
+                }
+                return order === 'asc' ? aText.localeCompare(bText) : bText.localeCompare(aText);
+            });
+
+            rows.forEach(row => table.appendChild(row)); // Reattach sorted rows
+
+            // Update sort indicators
+            Array.from(table.tHead.rows[0].cells).forEach((cell, index) => {
+                cell.classList.remove('sorted-asc', 'sorted-desc');
+                if (index === columnIndex) {
+                    cell.classList.add(order === 'asc' ? 'sorted-asc' : 'sorted-desc');
+                }
+            });
+
+            currentSort = { column: columnIndex, order };
+        }
+
+        function filterData(event) {
+            event.preventDefault();
+            const startdate = document.getElementById("startdate").value;
+            const enddate = document.getElementById("enddate").value;
+            alert(`Filtering from ${startdate} to ${enddate}`);
+            // Implement filtering logic as needed
+        }
+
+        // Fetch data on page load
+        window.onload = fetchData;
+    </script>
+</body>
 </html>
